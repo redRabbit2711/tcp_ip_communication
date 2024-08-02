@@ -1,0 +1,77 @@
+import socket
+import threading
+import unittest
+
+class Device:
+    def __init__(self, ip, port):
+        self.ip = ip
+        self.port = port
+        self.sock = None
+
+    def connect(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((self.ip, self.port))
+
+    def read(self):
+        if self.sock:
+            self.sock.sendall(b"READ")
+            return self.sock.recv(1024).decode()
+        return None
+
+    def write(self, value):
+        if self.sock:
+            self.sock.sendall(f"WRITE {value}".encode())
+            return self.sock.recv(1024).decode()
+        return None
+
+    def close(self):
+        if self.sock:
+            self.sock.close()
+
+
+class CommunicationManager:
+    def __init__(self):
+        self.devices = []
+
+    def add_device(self, device):
+        self.devices.append(device)
+
+    def connect_devices(self):
+        for device in self.devices:
+            device.connect()
+
+    def read_from_devices(self):
+        return {device.ip: device.read() for device in self.devices}
+
+    def write_to_devices(self, value):
+        return {device.ip: device.write(value) for device in self.devices}
+
+    def close_devices(self):
+        for device in self.devices:
+            device.close()
+
+
+# Test class
+class TestCommunication(unittest.TestCase):
+    def setUp(self):
+        self.manager = CommunicationManager()
+        # Replace with actual device IPs and ports for testing
+        self.manager.add_device(Device('127.0.0.1', 5000))
+        self.manager.connect_devices()
+
+    def test_read_write(self):
+        response = self.manager.write_to_devices("Test Value")
+        self.assertIn('127.0.0.1', response)
+
+        read_response = self.manager.read_from_devices()
+        self.assertIn('127.0.0.1', read_response)
+
+    def tearDown(self):
+        self.manager.close_devices()
+
+
+if __name__ == "__main__":
+    # You can run a simple TCP server on localhost for testing
+    # For example, a separate script could be created to run a server that echoes back
+    # data sent to it for read/write operations.
+    unittest.main()
