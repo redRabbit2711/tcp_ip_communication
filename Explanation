@@ -1,0 +1,7 @@
+1. Device Class: Represents a device that can connect using TCP/IP. It has methods for reading and writing data.
+
+2. CommunicationManager Class: Manages multiple devices, allowing for adding devices, connecting, reading from them, and writing to them simultaneously.
+
+3. Unit Tests: Uses unittest for testing read/write operations with the devices. You can replace the IP and port with actual values or mock them in your tests.
+
+4. TCP Server Stub: To test TCP communication, you might need to set up a TCP server separately that can accept connections and respond to read/write requests.
